@@ -3,56 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Image Saver</title>
+    <title>Drive Multi-Image Saver</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
-        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #eef2f7; margin: 0; padding: 20px; }
+        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h3 { text-align: center; color: #333; margin-bottom: 20px; }
+        label { font-size: 14px; font-weight: bold; color: #555; }
+        input { width: 100%; padding: 12px; margin: 8px 0 18px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: #28a745; outline: none; box-shadow: 0 0 5px rgba(40,167,69,0.2); }
+        button { width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
         button:hover { background-color: #218838; }
-        #status { margin-top: 10px; font-size: 14px; text-align: center; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #status { margin-top: 15px; font-size: 14px; text-align: center; font-weight: 500; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>Drive Saver</h3>
-    <input type="text" id="folderName" placeholder="Folder Name එක මෙතන ගහන්න">
-    <input type="text" id="imageLink" placeholder="Image Link එක මෙතන paste කරන්න">
-    <button onclick="saveToDrive()" id="saveBtn">Save</button>
+    <h3>Drive Image Saver</h3>
+    
+    <label>Folder Name:</label>
+    <input type="text" id="folderName" placeholder="Folder නම මෙතන ගහන්න">
+    
+    <label>Image Links (TradingView):</label>
+    <input type="text" class="img-link" placeholder="Image Link 01">
+    <input type="text" class="img-link" placeholder="Image Link 02">
+    <input type="text" class="img-link" placeholder="Image Link 03">
+    <input type="text" class="img-link" placeholder="Image Link 04">
+    <input type="text" class="img-link" placeholder="Image Link 05">
+    
+    <button onclick="saveToDrive()" id="saveBtn">Save All to Drive</button>
     <div id="status"></div>
 </div>
 
 <script>
     async function saveToDrive() {
         const folderName = document.getElementById('folderName').value;
-        const imageUrl = document.getElementById('imageLink').value;
+        const linkInputs = document.querySelectorAll('.img-link');
         const status = document.getElementById('status');
         const btn = document.getElementById('saveBtn');
 
-        if (!folderName || !imageUrl) {
-            alert("කරුණාකර සියල්ල සම්පූර්ණ කරන්න!");
+        // Link ටික list එකකට (Array) දාගන්නවා
+        const imageUrls = [];
+        linkInputs.forEach(input => {
+            if (input.value.trim() !== "") {
+                imageUrls.push(input.value.trim());
+            }
+        });
+
+        if (!folderName || imageUrls.length === 0) {
+            alert("කරුණාකර Folder නම සහ අවම වශයෙන් එක් Link එකක්වත් ඇතුළත් කරන්න!");
             return;
         }
 
-        status.innerText = "Saving... කරුණාකර රැඳී සිටින්න.";
+        status.innerText = "Saving " + imageUrls.length + " images... රැඳී සිටින්න.";
+        status.style.color = "blue";
         btn.disabled = true;
 
-        // පියවර 1 දී ලැබුණු Web App URL එක පහත තැනට දාන්න
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwsJ_-BQeVRTvFkS68GJN_WnCKph-CPWu0FFgV3RTwLyhg8eaiVzzYE4RFUAyhIaPlDAg/exec';
+        // --- ඔබේ අලුත් WEB APP URL එක මෙතනට දාන්න ---
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhIuUe60Kgl3rFU2qhRjc5VHUbnP9eu2n9cqjhaYe-OVeuH-NxaPhIqlURTh1qYK9sKw/exec';
 
         try {
-            const response = await fetch(WEB_APP_URL, {
+            await fetch(WEB_APP_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Browser security නිසා no-cors භාවිතා කරයි
+                mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ folderName, imageUrl })
+                body: JSON.stringify({ folderName, imageUrls })
             });
 
-            status.innerText = "ඉල්ලීම යැවුවා! Google Drive එක පරීක්ෂා කරන්න.";
+            status.innerText = "සාර්ථකයි! Google Drive එක පරීක්ෂා කරන්න.";
             status.style.color = "green";
+            
+            // සාර්ථක වුනාට පස්සේ input boxes හිස් කරන්න (අවශ්‍ය නම්)
+            // linkInputs.forEach(input => input.value = "");
+            
         } catch (error) {
-            status.innerText = "වැරදීමක් වුනා!";
+            status.innerText = "වැරදීමක් වුනා! නැවත උත්සාහ කරන්න.";
             status.style.color = "red";
         } finally {
             btn.disabled = false;

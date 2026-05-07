@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drive Image Saver</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #218838; }
+        #status { margin-top: 10px; font-size: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Drive Saver</h3>
+    <input type="text" id="folderName" placeholder="Folder Name එක මෙතන ගහන්න">
+    <input type="text" id="imageLink" placeholder="Image Link එක මෙතන paste කරන්න">
+    <button onclick="saveToDrive()" id="saveBtn">Save</button>
+    <div id="status"></div>
+</div>
+
+<script>
+    async function saveToDrive() {
+        const folderName = document.getElementById('folderName').value;
+        const imageUrl = document.getElementById('imageLink').value;
+        const status = document.getElementById('status');
+        const btn = document.getElementById('saveBtn');
+
+        if (!folderName || !imageUrl) {
+            alert("කරුණාකර සියල්ල සම්පූර්ණ කරන්න!");
+            return;
+        }
+
+        status.innerText = "Saving... කරුණාකර රැඳී සිටින්න.";
+        btn.disabled = true;
+
+        // පියවර 1 දී ලැබුණු Web App URL එක පහත තැනට දාන්න
+        const WEB_APP_URL = 'ඔබේ_WEB_APP_URL_එක_මෙතනට_දමන්න';
+
+        try {
+            const response = await fetch(WEB_APP_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Browser security නිසා no-cors භාවිතා කරයි
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ folderName, imageUrl })
+            });
+
+            status.innerText = "ඉල්ලීම යැවුවා! Google Drive එක පරීක්ෂා කරන්න.";
+            status.style.color = "green";
+        } catch (error) {
+            status.innerText = "වැරදීමක් වුනා!";
+            status.style.color = "red";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+</html>

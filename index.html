@@ -3,36 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drive Multi-Image Saver</title>
+    <title>Trading Chart Saver</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #eef2f7; margin: 0; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        h3 { text-align: center; color: #333; margin-bottom: 20px; }
-        label { font-size: 14px; font-weight: bold; color: #555; }
-        input { width: 100%; padding: 12px; margin: 8px 0 18px 0; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: #28a745; outline: none; box-shadow: 0 0 5px rgba(40,167,69,0.2); }
-        button { width: 100%; padding: 14px; background-color: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #218838; }
-        button:disabled { background-color: #ccc; cursor: not-allowed; }
-        #status { margin-top: 15px; font-size: 14px; text-align: center; font-weight: 500; }
+        body { font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        h3 { text-align: center; color: #1a73e8; margin-top: 0; }
+        .input-group { margin-bottom: 12px; }
+        label { font-size: 13px; font-weight: 600; color: #444; display: block; margin-bottom: 4px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: #1a73e8; outline: none; }
+        button { width: 100%; padding: 12px; background-color: #1a73e8; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #1557b0; }
+        #status { margin-top: 15px; font-size: 14px; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h3>Drive Image Saver</h3>
+    <h3>Trade Snapshots Saver</h3>
     
-    <label>Folder Name:</label>
-    <input type="text" id="folderName" placeholder="Folder නම මෙතන ගහන්න">
+    <div class="input-group">
+        <label>Folder Name (Trade Pair or Date):</label>
+        <input type="text" id="folderName" placeholder="උදා: BTCUSD Buy Setup">
+    </div>
     
-    <label>Image Links (TradingView):</label>
-    <input type="text" class="img-link" placeholder="Image Link 01">
-    <input type="text" class="img-link" placeholder="Image Link 02">
-    <input type="text" class="img-link" placeholder="Image Link 03">
-    <input type="text" class="img-link" placeholder="Image Link 04">
-    <input type="text" class="img-link" placeholder="Image Link 05">
+    <hr style="border: 0.5px solid #eee; margin: 20px 0;">
+
+    <div class="input-group">
+        <label>1. Kingdom Time Frame (Zoom Out):</label>
+        <input type="text" class="img-link" placeholder="Paste link here">
+    </div>
+    <div class="input-group">
+        <label>2. Kingdom Time Frame (Zoom In):</label>
+        <input type="text" class="img-link" placeholder="Paste link here">
+    </div>
+    <div class="input-group">
+        <label>3. Reading Time Frame (Zoom Out):</label>
+        <input type="text" class="img-link" placeholder="Paste link here">
+    </div>
+    <div class="input-group">
+        <label>4. Reading Time Frame (Zoom In):</label>
+        <input type="text" class="img-link" placeholder="Paste link here">
+    </div>
+    <div class="input-group">
+        <label>5. After TP or SL:</label>
+        <input type="text" class="img-link" placeholder="Paste link here">
+    </div>
     
-    <button onclick="saveToDrive()" id="saveBtn">Save All to Drive</button>
+    <button onclick="saveToDrive()" id="saveBtn">Save All Charts</button>
     <div id="status"></div>
 </div>
 
@@ -43,25 +61,19 @@
         const status = document.getElementById('status');
         const btn = document.getElementById('saveBtn');
 
-        // Link ටික list එකකට (Array) දාගන්නවා
-        const imageUrls = [];
-        linkInputs.forEach(input => {
-            if (input.value.trim() !== "") {
-                imageUrls.push(input.value.trim());
-            }
-        });
+        const imageUrls = Array.from(linkInputs).map(input => input.value.trim());
 
-        if (!folderName || imageUrls.length === 0) {
-            alert("කරුණාකර Folder නම සහ අවම වශයෙන් එක් Link එකක්වත් ඇතුළත් කරන්න!");
+        if (!folderName || imageUrls.every(url => url === "")) {
+            alert("කරුණාකර Folder නම සහ අවම වශයෙන් එක් Chart Link එකක්වත් දාන්න.");
             return;
         }
 
-        status.innerText = "Saving " + imageUrls.length + " images... රැඳී සිටින්න.";
-        status.style.color = "blue";
+        status.innerText = "Charts ටික Drive එකට යනවා... පොඩ්ඩක් ඉන්න.";
+        status.style.color = "#1a73e8";
         btn.disabled = true;
 
         // --- ඔබේ අලුත් WEB APP URL එක මෙතනට දාන්න ---
-        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbyhIuUe60Kgl3rFU2qhRjc5VHUbnP9eu2n9cqjhaYe-OVeuH-NxaPhIqlURTh1qYK9sKw/exec';
+        const WEB_APP_URL = 'ඔබේ_අලුත්_WEB_APP_URL_එක_මෙතනට_දමන්න';
 
         try {
             await fetch(WEB_APP_URL, {
@@ -71,14 +83,10 @@
                 body: JSON.stringify({ folderName, imageUrls })
             });
 
-            status.innerText = "සාර්ථකයි! Google Drive එක පරීක්ෂා කරන්න.";
+            status.innerText = "සියල්ල සාර්ථකව Save වුනා!";
             status.style.color = "green";
-            
-            // සාර්ථක වුනාට පස්සේ input boxes හිස් කරන්න (අවශ්‍ය නම්)
-            // linkInputs.forEach(input => input.value = "");
-            
         } catch (error) {
-            status.innerText = "වැරදීමක් වුනා! නැවත උත්සාහ කරන්න.";
+            status.innerText = "Error එකක් ආවා. ආයෙත් Try කරන්න.";
             status.style.color = "red";
         } finally {
             btn.disabled = false;
